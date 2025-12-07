@@ -1,0 +1,391 @@
+<!DOCTYPE html> 
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌸 My Diary 🌸</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
+
+body {
+    font-family: 'Pacifico', cursive;
+    background: url('C:/Users/User/Desktop/wmremove-transformed.png') no-repeat center center fixed;
+    background-size: cover;
+    backdrop-filter: blur(2px);
+    margin: 0;
+    padding: 20px;
+    color: #d16b8c;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* Petals */
+.petal-img {
+    pointer-events: none;
+    position: absolute;
+    width: 40px;
+    height: auto;
+    z-index: 1000;
+    opacity: 0.9;
+    animation-name: fallPetal;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+}
+
+@keyframes fallPetal {
+    0% { transform: translateY(-80px) rotate(0deg); }
+    100% { transform: translateY(calc(100vh + 80px)) rotate(360deg); }
+}
+
+/* Header */
+.header-box {
+    width: fit-content;
+    padding: 15px 35px;
+    margin: 0 auto 25px auto;
+    border-radius: 20px;
+    background: rgba(255, 180, 200, 0.55);
+    backdrop-filter: blur(4px);
+    font-size: 40px;
+    color: #d16b8c;
+    box-shadow: 0 0 15px rgba(255, 150, 190, 0.7);
+    text-align: center;
+}
+
+/* Notebook */
+.container { width: 90%; max-width: 700px; margin: auto; padding: 20px; }
+.section { background: rgba(255, 180, 210, 0.55); backdrop-filter: blur(4px); padding: 15px; border-radius: 20px; margin-bottom: 15px; }
+.section-header { display: flex; justify-content: space-between; align-items: center; }
+.section-title { font-size: 24px; cursor: text; color: #d16b8c; outline: none; }
+
+/* Buttons in note area */
+.rename-btn, .toggle-btn, .add-note-btn, .delete-btn {
+    background: #f8c8dc;
+    border: 2px solid #f8c8dc;
+    border-radius: 10px;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-family: 'Pacifico', cursive;
+    font-size: 16px;
+    color: #d16b8c;
+}
+
+/* NOTE DELETE BUTTON (the ❌ inside notes) */
+.note-delete {
+    background: #f8c8dc;   /* ← UPDATED COLOR */
+    border: 2px solid #f8c8dc;
+    border-radius: 8px;
+    position:absolute;
+    top:5px;
+    right:10px;
+    cursor:pointer;
+    padding:2px 6px;
+    font-size:14px;
+    color:#d16b8c;
+}
+
+.note { 
+    background: rgba(255,215,230,0.7);
+    border-radius:20px; 
+    padding:15px; 
+    margin-top:10px; 
+    position:relative; 
+    font-size:20px; 
+    line-height:28px; 
+    width:100%; 
+    box-sizing:border-box; 
+    backdrop-filter: blur(3px);
+    background-image: repeating-linear-gradient(
+        to bottom,
+        transparent,
+        transparent 27px,
+        #db84a9 28px
+    );
+}
+.note-content { 
+    white-space: pre-line; 
+    min-height:20px; 
+    color:#d16b8c; 
+    outline:none; 
+}
+/* Mood Calendar */
+.mood-calendar-container { background: rgba(255, 180, 200, 0.55); backdrop-filter: blur(4px); border-radius: 20px; padding: 20px; margin-top: 30px; color: #d16b8c; text-align:center; }
+.mood-selector { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; justify-content:center; }
+.mood-selector select, .mood-selector input, .mood-selector button { font-family: 'Pacifico', cursive; font-size: 18px; padding: 5px 10px; border-radius: 12px; border: 2px solid #fcbbd1; outline: none; color: #d16b8c; background: rgba(255,215,230,0.7); }
+#moodNote::placeholder { color: #d16b8c; }
+.calendar-header { display: flex; justify-content: center; align-items: center; margin-bottom: 10px; gap:10px; }
+.calendar-header button { background: #fcbbd1; border: 2px solid #fcbbd1; border-radius: 12px; padding: 5px 10px; font-family: 'Pacifico', cursive; font-size: 20px; color: #d16b8c; cursor: pointer; }
+.calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; justify-content:center; }
+.day, .day-name { height: 60px; border-radius: 12px; background: rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; font-size: 20px; color: #d16b8c; flex-direction: column; position: relative; }
+.day-name { font-weight: bold; }
+.mood-emoji { cursor: pointer; font-size: 22px; margin: 2px; padding: 2px 5px; border-radius: 50%; }
+
+#pie-container { margin-top: 20px; width:300px; height:300px; margin-left:auto; margin-right:auto; }
+</style>
+</head>
+<body>
+
+<script>
+const petalImages = [
+    'C:/Users/User/Desktop/c5a298ae0c2f85d806a2cac55e306a68_t-removebg-preview.png',
+    'C:/Users/User/Desktop/4e6d056512c3cc419258ade8db91f060-removebg-preview.png'
+];
+
+function createPetals(num=30){
+    for(let i=0;i<num;i++){
+        const img=document.createElement('img');
+        img.src=petalImages[Math.floor(Math.random()*petalImages.length)];
+        img.className='petal-img';
+        img.style.left=Math.random()*100 + 'vw';
+        img.style.top = (-80 - Math.random()*200)+'px';
+        img.style.animationDuration = (12+Math.random()*12) + 's';
+        img.style.animationDelay = Math.random()*5 + 's';
+        img.style.transform = `rotate(${Math.random()*360}deg) scale(${0.9 + Math.random()*0.5})`;
+        document.body.appendChild(img);
+    }
+}
+createPetals();
+</script>
+
+<div class="header-box">🌸 My Diary 🌸</div>
+
+<div class="container">
+    <div id="sections"></div>
+    <button class="add-note-btn" onclick="addSection()">+ Add Section</button>
+
+    <div class="mood-calendar-container">
+        <div class="mood-selector">
+            <select id="moodSelect">
+                <option value="😆">😆</option>
+                <option value="😭">😭</option>
+                <option value="😴">😴</option>
+                <option value="🤮">🤮</option>
+                <option value="😊">😊</option>
+                <option value="😫">😫</option>
+                <option value="😡">😡</option>
+            </select>
+            <input type="text" id="moodNote" placeholder="Add a note..." />
+            <button class="add-mood-btn" onclick="addMood()">Add Mood</button>
+            <button class="add-mood-btn" onclick="togglePie()">Mood Chart</button>
+        </div>
+
+        <div class="calendar-header">
+            <button onclick="prevMonth()">❮</button>
+            <div id="monthYear"></div>
+            <button onclick="nextMonth()">❯</button>
+        </div>
+
+        <div class="calendar-grid" id="calendar"></div>
+
+        <div id="pie-container">
+            <canvas id="moodPie"></canvas>
+        </div>
+    </div>
+</div>
+
+<script>
+// --- Mood & Calendar ---
+let moodData = JSON.parse(localStorage.getItem('moodData'))||{};
+let current = new Date();
+let currentMonth = current.getMonth();
+let currentYear = current.getFullYear();
+let pieChart;
+
+const moodColors = {
+    "😆":"#e69def",
+    "😭":"#9d9def",
+    "😴":"#9dd4ef",
+    "🤮":"#9defa9",
+    "😊":"#edef9d",
+    "😫":"#edb89f",
+    "😡":"#ed9e9f"
+};
+
+function saveMoodData(){ localStorage.setItem('moodData',JSON.stringify(moodData)); }
+
+function addMood(){
+    const emoji=document.getElementById('moodSelect').value;
+    const note=document.getElementById('moodNote').value;
+    const dateStr=`${currentYear}-${currentMonth+1}-${current.getDate()}`;
+    if(!moodData[dateStr]) moodData[dateStr]=[];
+    moodData[dateStr].push({emoji,note});
+    saveMoodData();
+    document.getElementById('moodNote').value='';
+    renderCalendar();
+    updatePie();
+}
+
+function deleteMood(dateStr,index){
+    moodData[dateStr].splice(index,1);
+    if(moodData[dateStr].length===0) delete moodData[dateStr];
+    saveMoodData();
+    renderCalendar();
+    updatePie();
+}
+
+function renderCalendar(){
+    const cal=document.getElementById('calendar'); 
+    cal.innerHTML='';
+    const monthYearDiv=document.getElementById('monthYear');
+    const monthNames=["January","February","March","April","May","June","July","August","September","October","November","December"];
+    monthYearDiv.innerText=`${monthNames[currentMonth]} ${currentYear}`;
+    const firstDay=new Date(currentYear,currentMonth,1).getDay();
+    const daysInMonth=new Date(currentYear,currentMonth+1,0).getDate();
+    const dayNames=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+    dayNames.forEach(d=>{
+        const dn=document.createElement('div'); dn.className='day-name'; dn.innerText=d; cal.appendChild(dn);
+    });
+    for(let i=0;i<firstDay;i++) cal.appendChild(document.createElement('div'));
+    for(let d=1;d<=daysInMonth;d++){
+        const dayDiv=document.createElement('div'); dayDiv.className='day';
+        const dateStr=`${currentYear}-${currentMonth+1}-${d}`;
+        dayDiv.dataset.date=dateStr;
+        const moodsToday=moodData[dateStr];
+        if(moodsToday){
+            moodsToday.forEach((m,i)=>{
+                const emojiDiv=document.createElement('div'); 
+                emojiDiv.className='mood-emoji';
+                emojiDiv.innerText=m.emoji;
+                emojiDiv.title=m.note;
+                emojiDiv.style.background=moodColors[m.emoji];
+                emojiDiv.onclick=()=>deleteMood(dateStr,i);
+                dayDiv.appendChild(emojiDiv);
+            });
+        }
+        if(dayDiv.childNodes.length===0) dayDiv.innerText=d;
+        cal.appendChild(dayDiv);
+    }
+}
+
+function prevMonth(){ currentMonth--; if(currentMonth<0){ currentMonth=11; currentYear--; } renderCalendar(); }
+function nextMonth(){ currentMonth++; if(currentMonth>11){ currentMonth=0; currentYear++; } renderCalendar(); }
+
+function togglePie(){
+    const container=document.getElementById('pie-container');
+    if(container.style.display==='none'){ container.style.display='block'; updatePie(); } 
+    else container.style.display='none';
+}
+
+function updatePie(){
+    const moodCounts={"😆":0,"😭":0,"😴":0,"🤮":0,"😊":0,"😫":0,"😡":0};
+    const monthStr=`${currentYear}-${currentMonth+1}`;
+    Object.keys(moodData).forEach(d=>{
+        if(d.startsWith(monthStr)) moodData[d].forEach(m=>moodCounts[m.emoji]++);
+    });
+    const data=Object.values(moodCounts);
+    if(pieChart) pieChart.destroy();
+    const ctx=document.getElementById('moodPie').getContext('2d');
+    pieChart=new Chart(ctx,{
+        type:'pie',
+        data:{
+            labels:Object.keys(moodCounts),
+            datasets:[{
+                data:data,
+                backgroundColor:Object.keys(moodCounts).map(e=>moodColors[e])
+            }]
+        },
+        options:{ responsive:true, plugins:{legend:{position:'bottom'}} }
+    });
+}
+
+// --- Notebook ---
+let notebookData=JSON.parse(localStorage.getItem('notebookData'))||[];
+let sectionId=notebookData.length?notebookData[notebookData.length-1].id:0;
+
+function saveData(){ localStorage.setItem('notebookData',JSON.stringify(notebookData)); }
+
+function addSection(){ 
+    sectionId++; 
+    notebookData.push({id:sectionId,title:"New Section",notes:[],open:true});
+    renderNotebook(); 
+    saveData();
+}
+
+function deleteSection(id){ 
+    notebookData=notebookData.filter(s=>s.id!==id); 
+    renderNotebook(); 
+    saveData();
+}
+
+function toggleSection(id){ 
+    const sec=notebookData.find(s=>s.id===id); 
+    sec.open=!sec.open; 
+    renderNotebook(); 
+    saveData();
+}
+
+function renameSection(id,elem){
+    const sec=notebookData.find(s=>s.id===id);
+    const titleDiv=elem.previousElementSibling;
+    titleDiv.contentEditable=true;
+    titleDiv.focus();
+    titleDiv.addEventListener('blur',()=>{
+        sec.title=titleDiv.innerText.trim()||"New Section"; 
+        titleDiv.contentEditable=false; 
+        renderNotebook(); 
+        saveData();
+    },{once:true});
+}
+
+function addNote(id){
+    const sec=notebookData.find(s=>s.id===id);
+    sec.notes.push("");
+    renderNotebook();
+    saveData();
+}
+
+function deleteNote(id,n){
+    const sec=notebookData.find(s=>s.id===id);
+    sec.notes.splice(n,1);
+    renderNotebook();
+    saveData();
+}
+
+function updateNote(id,n,val){
+    const sec=notebookData.find(s=>s.id===id);
+    sec.notes[n]=val;
+    saveData();
+}
+
+function updateSectionTitle(id,elem){
+    const sec=notebookData.find(s=>s.id===id);
+    sec.title=elem.innerText.trim()||"New Section";
+    saveData();
+}
+
+function renderNotebook(){
+    const div=document.getElementById('sections'); 
+    div.innerHTML='';
+    notebookData.forEach(sec=>{
+        const sectionDiv=document.createElement('div'); 
+        sectionDiv.className='section';
+
+        const notesHTML=sec.notes.map((n,i)=>`
+            <div class="note">
+                <button class="note-delete" onclick="deleteNote(${sec.id},${i})">❌</button>
+                <div class="note-content" contenteditable="true" oninput="updateNote(${sec.id},${i},this.innerText)">${n}</div>
+            </div>
+        `).join('');
+
+        sectionDiv.innerHTML=`
+            <div class="section-header">
+                <span class="section-title" contenteditable="true" onblur="updateSectionTitle(${sec.id},this)">${sec.title}</span>
+                <div>
+                    <button class="rename-btn" onclick="renameSection(${sec.id},this)">Rename</button>
+                    <button class="toggle-btn" onclick="toggleSection(${sec.id})">Toggle</button>
+                    <button class="delete-btn" onclick="deleteSection(${sec.id})">Delete</button>
+                    <button class="add-note-btn" onclick="addNote(${sec.id})">+ Note</button>
+                </div>
+            </div>
+            <div class="notes" style="display:${sec.open?'block':'none'}">${notesHTML}</div>
+        `;
+        div.appendChild(sectionDiv);
+    });
+}
+
+renderCalendar();
+renderNotebook();
+</script>
+
+</body>
+</html>
