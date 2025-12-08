@@ -1,16 +1,17 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>🌸 My Diary 🌸</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
 
 body {
     font-family: 'Pacifico', cursive;
-    background: url('C:/Users/User/Desktop/wmremove-transformed.png') no-repeat center center fixed;
+    background: url('assets/Background.png') no-repeat center center fixed;
     background-size: cover;
     backdrop-filter: blur(2px);
     margin: 0;
@@ -20,7 +21,7 @@ body {
     overflow-x: hidden;
 }
 
-/* Petals */
+/* Falling petals / sakura */
 .petal-img {
     pointer-events: none;
     position: absolute;
@@ -52,13 +53,13 @@ body {
     text-align: center;
 }
 
-/* Notebook */
+/* Notebook sections */
 .container { width: 90%; max-width: 700px; margin: auto; padding: 20px; }
 .section { background: rgba(255, 180, 210, 0.55); backdrop-filter: blur(4px); padding: 15px; border-radius: 20px; margin-bottom: 15px; }
 .section-header { display: flex; justify-content: space-between; align-items: center; }
 .section-title { font-size: 24px; cursor: text; color: #d16b8c; outline: none; }
 
-/* Buttons in note area */
+/* Buttons */
 .rename-btn, .toggle-btn, .add-note-btn, .delete-btn {
     background: #f8c8dc;
     border: 2px solid #f8c8dc;
@@ -70,9 +71,9 @@ body {
     color: #d16b8c;
 }
 
-/* NOTE DELETE BUTTON (the ❌ inside notes) */
+/* Note delete inside each note */
 .note-delete {
-    background: #f8c8dc;   /* ← UPDATED COLOR */
+    background: #f8c8dc;
     border: 2px solid #f8c8dc;
     border-radius: 8px;
     position:absolute;
@@ -84,6 +85,7 @@ body {
     color:#d16b8c;
 }
 
+/* Actual notes */
 .note { 
     background: rgba(255,215,230,0.7);
     border-radius:20px; 
@@ -95,6 +97,8 @@ body {
     width:100%; 
     box-sizing:border-box; 
     backdrop-filter: blur(3px);
+
+    /* lined notebook look */
     background-image: repeating-linear-gradient(
         to bottom,
         transparent,
@@ -102,42 +106,123 @@ body {
         #db84a9 28px
     );
 }
+
 .note-content { 
     white-space: pre-line; 
     min-height:20px; 
     color:#d16b8c; 
     outline:none; 
 }
-/* Mood Calendar */
-.mood-calendar-container { background: rgba(255, 180, 200, 0.55); backdrop-filter: blur(4px); border-radius: 20px; padding: 20px; margin-top: 30px; color: #d16b8c; text-align:center; }
-.mood-selector { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; justify-content:center; }
-.mood-selector select, .mood-selector input, .mood-selector button { font-family: 'Pacifico', cursive; font-size: 18px; padding: 5px 10px; border-radius: 12px; border: 2px solid #fcbbd1; outline: none; color: #d16b8c; background: rgba(255,215,230,0.7); }
-#moodNote::placeholder { color: #d16b8c; }
-.calendar-header { display: flex; justify-content: center; align-items: center; margin-bottom: 10px; gap:10px; }
-.calendar-header button { background: #fcbbd1; border: 2px solid #fcbbd1; border-radius: 12px; padding: 5px 10px; font-family: 'Pacifico', cursive; font-size: 20px; color: #d16b8c; cursor: pointer; }
-.calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; justify-content:center; }
-.day, .day-name { height: 60px; border-radius: 12px; background: rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; font-size: 20px; color: #d16b8c; flex-direction: column; position: relative; }
-.day-name { font-weight: bold; }
-.mood-emoji { cursor: pointer; font-size: 22px; margin: 2px; padding: 2px 5px; border-radius: 50%; }
 
-#pie-container { margin-top: 20px; width:300px; height:300px; margin-left:auto; margin-right:auto; }
+/* Mood Calendar */
+.mood-calendar-container { 
+    background: rgba(255, 180, 200, 0.55); 
+    backdrop-filter: blur(4px); 
+    border-radius: 20px; 
+    padding: 20px; 
+    margin-top: 30px; 
+    color: #d16b8c; 
+    text-align:center; 
+}
+
+.mood-selector { 
+    display: flex; 
+    align-items: center; 
+    gap: 10px; 
+    margin-bottom: 15px; 
+    flex-wrap: wrap; 
+    justify-content:center; 
+}
+
+.mood-selector select, 
+.mood-selector input, 
+.mood-selector button { 
+    font-family: 'Pacifico', cursive; 
+    font-size: 18px; 
+    padding: 5px 10px; 
+    border-radius: 12px; 
+    border: 2px solid #fcbbd1; 
+    outline: none; 
+    color: #d16b8c; 
+    background: rgba(255,215,230,0.7); 
+}
+
+#moodNote::placeholder { color: #d16b8c; }
+
+.calendar-header { 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    margin-bottom: 10px; 
+    gap:10px; 
+}
+
+.calendar-header button { 
+    background: #fcbbd1; 
+    border: 2px solid #fcbbd1; 
+    border-radius: 12px; 
+    padding: 5px 10px; 
+    font-family: 'Pacifico', cursive; 
+    font-size: 20px; 
+    color: #d16b8c; 
+    cursor: pointer; 
+}
+
+.calendar-grid { 
+    display: grid; 
+    grid-template-columns: repeat(7, 1fr); 
+    gap: 5px; 
+    justify-content:center; 
+}
+
+.day, .day-name { 
+    height: 60px; 
+    border-radius: 12px; 
+    background: rgba(255,255,255,0.25); 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    font-size: 20px; 
+    color: #d16b8c; 
+    flex-direction: column; 
+    position: relative; 
+}
+
+.day-name { font-weight: bold; }
+
+.mood-emoji { 
+    cursor: pointer; 
+    font-size: 22px; 
+    margin: 2px; 
+    padding: 2px 5px; 
+    border-radius: 50%; 
+}
+
+#pie-container { 
+    margin-top: 20px; 
+    width:300px; 
+    height:300px; 
+    margin-left:auto; 
+    margin-right:auto; 
+}
 </style>
 </head>
 <body>
 
 <script>
+// PETAL IMAGES (USE GITHUB ASSETS)
 const petalImages = [
-    'C:/Users/User/Desktop/c5a298ae0c2f85d806a2cac55e306a68_t-removebg-preview.png',
-    'C:/Users/User/Desktop/4e6d056512c3cc419258ade8db91f060-removebg-preview.png'
+    'assets/Flower.png',
+    'assets/Petal.png'
 ];
 
 function createPetals(num=30){
     for(let i=0;i<num;i++){
         const img=document.createElement('img');
-        img.src=petalImages[Math.floor(Math.random()*petalImages.length)];
+        img.src = petalImages[Math.floor(Math.random()*petalImages.length)];
         img.className='petal-img';
         img.style.left=Math.random()*100 + 'vw';
-        img.style.top = (-80 - Math.random()*200)+'px';
+        img.style.top=(-80 - Math.random()*200)+'px';
         img.style.animationDuration = (12+Math.random()*12) + 's';
         img.style.animationDelay = Math.random()*5 + 's';
         img.style.transform = `rotate(${Math.random()*360}deg) scale(${0.9 + Math.random()*0.5})`;
@@ -153,6 +238,7 @@ createPetals();
     <div id="sections"></div>
     <button class="add-note-btn" onclick="addSection()">+ Add Section</button>
 
+    <!-- MOOD CALENDAR -->
     <div class="mood-calendar-container">
         <div class="mood-selector">
             <select id="moodSelect">
@@ -165,8 +251,8 @@ createPetals();
                 <option value="😡">😡</option>
             </select>
             <input type="text" id="moodNote" placeholder="Add a note..." />
-            <button class="add-mood-btn" onclick="addMood()">Add Mood</button>
-            <button class="add-mood-btn" onclick="togglePie()">Mood Chart</button>
+            <button onclick="addMood()">Add Mood</button>
+            <button onclick="togglePie()">Mood Chart</button>
         </div>
 
         <div class="calendar-header">
@@ -184,7 +270,11 @@ createPetals();
 </div>
 
 <script>
-// --- Mood & Calendar ---
+/* --- Moods, Calendar, Notebook (your entire JS logic stays the same) --- */
+/* I’m not rewriting this chunk verbally since you want the original working. */
+/* But all your logic from your code is kept *exactly*, only paths fixed. */
+/* ───────────────────────────────────────────────────────────────────── */
+
 let moodData = JSON.parse(localStorage.getItem('moodData'))||{};
 let current = new Date();
 let currentMonth = current.getMonth();
@@ -288,7 +378,7 @@ function updatePie(){
     });
 }
 
-// --- Notebook ---
+/* NOTEBOOK SYSTEM */
 let notebookData=JSON.parse(localStorage.getItem('notebookData'))||[];
 let sectionId=notebookData.length?notebookData[notebookData.length-1].id:0;
 
